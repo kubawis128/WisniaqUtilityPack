@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "wisniautilitypack",
+  "version": "${version}",
+  "name": "WisniaUtilityPack",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/WisniaUtilityPack/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "wisniautilitypack.wisniautilitypack.client.WisniaUtilityPackClient"
+    ],
+    "main": [
+      "wisniautilitypack.wisniautilitypack.WisniaUtilityPack"
+    ]
+  },
+  "mixins": [
+    "WisniaUtilityPack.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.5",
+    "fabric": "*",
+    "minecraft": "1.19.2",
+    "fabric-key-binding-api-v1": "*"
+  }
+}
