@@ -5,6 +5,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import wisniautilitypack.wisniautilitypack.modules.HUD.CheatsMenuHUD;
 import wisniautilitypack.wisniautilitypack.modules.Module;
 import wisniautilitypack.wisniautilitypack.utils.Colors;
 
@@ -113,6 +114,9 @@ public class WindowingSystem extends Screen {
                 index++;
             }
             if(element.type == GUIElement.ElementType.MODULETOGGLE){
+                if(element.getModule() instanceof CheatsMenuHUD){
+                    return;
+                }
                 if(element.getWidth() > window.coord.width){
                     window.coord.setWidth(element.getWidth());
                 }

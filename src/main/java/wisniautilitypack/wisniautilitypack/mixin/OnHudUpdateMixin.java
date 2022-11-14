@@ -17,6 +17,7 @@ public class OnHudUpdateMixin {
     @Inject(method = "render"  ,at=@At("RETURN"))
     public void render(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
         CheatList.draw(matrices);
+        //TODO: Create an event for this
         //WindowingSystem.draw(matrices);
         /*RenderSystem.disableTexture();
         RenderSystem.enableDepthTest();

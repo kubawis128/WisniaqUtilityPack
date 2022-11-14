@@ -11,9 +11,10 @@ import wisniautilitypack.wisniautilitypack.modules.AutoFishing.AutoFishingMain;
 import wisniautilitypack.wisniautilitypack.modules.AutoVillagerChecking.AutoVillagerMain;
 import wisniautilitypack.wisniautilitypack.modules.ESP.ContainerESP;
 import wisniautilitypack.wisniautilitypack.modules.ESP.EntityESP;
+import wisniautilitypack.wisniautilitypack.modules.HUD.CheatList;
 import wisniautilitypack.wisniautilitypack.modules.HUD.CheatsMenuHUD;
 import wisniautilitypack.wisniautilitypack.modules.Module;
-import wisniautilitypack.wisniautilitypack.modules.Xray.XrayMain;
+import wisniautilitypack.wisniautilitypack.modules.Utils.XrayMain;
 import wisniautilitypack.wisniautilitypack.modules.Module.ModuleCategory;
 import wisniautilitypack.wisniautilitypack.utils.Colors;
 import wisniautilitypack.wisniautilitypack.utils.events.Event;
@@ -55,6 +56,8 @@ public class WisniaUtilityPackClient implements ClientModInitializer, EventListe
         ModuleList.add(entityESP);
         ContainerESP containerESP = new ContainerESP("Chest ESP","Draws box over chest","", ModuleCategory.RENDER);
         ModuleList.add(containerESP);
+        CheatList cheatList = new CheatList("Cheat List","Shows active modules on screen","", ModuleCategory.RENDER);
+        ModuleList.add(cheatList);
         CheatsMenuHUD cheatsMenuHUD = new CheatsMenuHUD("menu","Opens conf menu","", ModuleCategory.RENDER);
         ModuleList.add(cheatsMenuHUD);
 
