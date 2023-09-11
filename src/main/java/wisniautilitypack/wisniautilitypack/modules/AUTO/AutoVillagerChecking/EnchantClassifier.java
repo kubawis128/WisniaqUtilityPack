@@ -1,4 +1,4 @@
-package wisniautilitypack.wisniautilitypack.modules.AutoVillagerChecking;
+package wisniautilitypack.wisniautilitypack.modules.AUTO.AutoVillagerChecking;
 
 import java.util.ArrayList;
 
@@ -10,7 +10,6 @@ public class EnchantClassifier {
     public static ArrayList<Enchant> badEnchantsList;
 
     public static String oldGoodEnchantsString;
-    public static String oldBadEnchantsString;
 
     public static EnchantClass classifyEnchant(String enchant, int lvl){
         if (badEnchantsList == null || badEnchantsList.size() == 0){
@@ -22,9 +21,9 @@ public class EnchantClassifier {
             goodEnchantsList = new ArrayList<Enchant>();
             goodEnchantsList.add(new Enchant("mending",1));
         }
-        if(badEnchantsList.stream().anyMatch((e)->{return enchant.toLowerCase().equals("enchantment.minecraft." + e.enchantName().toLowerCase()) && lvl >= e.level();} )){
+        if(badEnchantsList.stream().anyMatch((e)-> enchant.toLowerCase().equals("enchantment.minecraft." + e.enchantName().toLowerCase()) && lvl >= e.level())){
             return EnchantClass.BAD;
-        }else if (goodEnchantsList.stream().anyMatch((e)->{return enchant.toLowerCase().equals("enchantment.minecraft." + e.enchantName().toLowerCase()) && lvl >= e.level();} )){
+        }else if (goodEnchantsList.stream().anyMatch((e)-> enchant.toLowerCase().equals("enchantment.minecraft." + e.enchantName().toLowerCase()) && lvl >= e.level())){
             return EnchantClass.GOOD;
         }
         return EnchantClass.NEUTRAL;

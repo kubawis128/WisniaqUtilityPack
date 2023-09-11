@@ -1,4 +1,4 @@
-package wisniautilitypack.wisniautilitypack.modules.ESP;
+package wisniautilitypack.wisniautilitypack.modules.RENDER.ESP;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -46,7 +46,7 @@ public class ContainerESP extends Module implements EventListener {
     }
 
     public record Result(BlockState blockState,BlockPos blockPos){}
-    public static ArrayList<Result> resoults = new ArrayList<>();
+    public static ArrayList<Result> results = new ArrayList<>();
 
     public void changeEnable(){
         if(enabled){
@@ -58,16 +58,16 @@ public class ContainerESP extends Module implements EventListener {
                 for (x = -64; x <= 64; x ++) {
                     for (z = -64; z <= 64; z ++) {
                         Vec3d PlayerPos = MinecraftClient.getInstance().player.getPos();
-                        BlockPos pos = new BlockPos(y-PlayerPos.getY(),x-PlayerPos.getX(),z-PlayerPos.getZ());
+                        BlockPos pos = new BlockPos((int) (y-PlayerPos.getY()), (int) (x-PlayerPos.getX()), (int) (z-PlayerPos.getZ()));
                         BlockState blockState = MinecraftClient.getInstance().world.getBlockState(pos);
-                        if(blockState.getBlock().getTranslationKey().contains("chest")){ // TODO: Add interesting blocks list
-                            resoults.add(new Result(blockState,pos));
+                        if(blockState.getBlock().getTranslationKey().contains("result")){ // TODO: Add interesting blocks list
+                            results.add(new Result(blockState,pos));
                         }
                     }
                 }
             }
         }else{
-            resoults.clear();
+            results.clear();
         }
         MinecraftClient.getInstance().player.sendMessage(Text.of("Container ESP is now " + ((enabled) ? "enabled" : "disabled")), true);
     }
@@ -95,7 +95,7 @@ public class ContainerESP extends Module implements EventListener {
                         BlockPos pos = new BlockPos(x+worldChunk.getPos().getStartPos().getX(),y+worldChunk.getPos().getStartPos().getY(),z+worldChunk.getPos().getStartPos().getZ());
                         BlockState blockState = MinecraftClient.getInstance().world.getBlockState(pos);
                         if(blockState.getBlock().getTranslationKey().contains("chest")){ // TODO: add interesting blocks
-                            resoults.add(new Result(blockState,pos));
+                            results.add(new Result(blockState,pos));
                         }
                     }
                 }
@@ -112,7 +112,7 @@ public class ContainerESP extends Module implements EventListener {
     @Override
     public void onEvent(EventName eventName){
         if(eventName == EventName.WORLD_UNLOAD){
-            resoults.clear();
+            results.clear();
         }
     }
     public static void draw(MatrixStack matrices, Camera camera){
@@ -120,8 +120,8 @@ public class ContainerESP extends Module implements EventListener {
             return;
         }
         MinecraftClient client = MinecraftClient.getInstance();
-        if(client.player != null && resoults.size() != 0) {
-            for (Result resoult: resoults) {
+        if(client.player != null && results.size() != 0) {
+            for (Result resoult: results) {
                 Renderer.drawBox(matrices,camera,resoult.blockPos.getX(),resoult.blockPos.getY(),resoult.blockPos.getZ(),resoult.blockPos.getX()+1,resoult.blockPos.getY()+1,resoult.blockPos.getZ()+1,new Colors.ColorRGBA(1.0f,1.0f,0.0f,0.4f),false);
                 Renderer.drawBox(matrices,camera,resoult.blockPos.getX(),resoult.blockPos.getY(),resoult.blockPos.getZ(),resoult.blockPos.getX()+1,resoult.blockPos.getY()+1,resoult.blockPos.getZ()+1,new Colors.ColorRGBA(1.0f,1.0f,0.0f,0.75f),true);
             }

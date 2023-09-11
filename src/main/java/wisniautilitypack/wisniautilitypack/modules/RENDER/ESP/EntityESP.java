@@ -1,4 +1,4 @@
-package wisniautilitypack.wisniautilitypack.modules.ESP;
+package wisniautilitypack.wisniautilitypack.modules.RENDER.ESP;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -22,7 +22,7 @@ import java.util.HashMap;
 
 import static net.minecraft.util.math.MathHelper.clamp;
 import static wisniautilitypack.wisniautilitypack.client.WisniaUtilityPackClient.inWorld;
-import static wisniautilitypack.wisniautilitypack.modules.ESP.EntityTypes.getEntityType;
+import static wisniautilitypack.wisniautilitypack.modules.RENDER.ESP.EntityTypes.getEntityType;
 import static wisniautilitypack.wisniautilitypack.utils.Renderer.*;
 
 public class EntityESP extends Module {

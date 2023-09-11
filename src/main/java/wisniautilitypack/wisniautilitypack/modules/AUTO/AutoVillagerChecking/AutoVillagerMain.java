@@ -1,4 +1,4 @@
-package wisniautilitypack.wisniautilitypack.modules.AutoVillagerChecking;
+package wisniautilitypack.wisniautilitypack.modules.AUTO.AutoVillagerChecking;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -13,8 +13,8 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.network.Packet;
 import net.minecraft.network.listener.PacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
 import net.minecraft.network.packet.s2c.play.SetTradeOffersS2CPacket;
 import net.minecraft.screen.ScreenHandlerType;
@@ -85,17 +85,19 @@ public class AutoVillagerMain extends Module {
     }
     public void init(){
         client = MinecraftClient.getInstance();
-        ServerWorldEvents.LOAD.register(((server, world) -> HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> {
+        ServerWorldEvents.LOAD.register(((server, world) -> HudRenderCallback.EVENT.register((context, tickDelta) -> {
             TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
             int h = MinecraftClient.getInstance().getWindow().getScaledHeight();
             int w = MinecraftClient.getInstance().getWindow().getScaledWidth();
-            renderer.drawWithShadow(matrixStack,  offersRenderer.toShow, w - renderer.getWidth(offersRenderer.toShow) - 25, h - 25, offersRenderer.toShowColor);
+            context.drawText(renderer, offersRenderer.toShow, w - renderer.getWidth(offersRenderer.toShow) - 25, h - 25, offersRenderer.toShowColor,true);
+            context.drawText(renderer, offersRenderer.price, w - renderer.getWidth(offersRenderer.price) - 25, h - 10, offersRenderer.toShowColor,true);
         })));
 
         ClientTickEvents.END_CLIENT_TICK.register((e) -> {
             if (inWorld) {
                 if (tickCounterGuiClear >= 200){
                     offersRenderer.toShow = ""; // Clear trades text after 10 seconds (200 ticks) // TODO: config 200 ticks or 0 to never
+                    offersRenderer.price = "";
                     tickCounterGuiClear = 0;
                 }
                 if (keybindCounter >= 5){
@@ -123,11 +125,14 @@ public class AutoVillagerMain extends Module {
                     }
 
                     VillagerEntity villager = (VillagerEntity) closestEntity;
-
-                    if(villager.getVillagerData().getProfession() == VillagerProfession.LIBRARIAN){
-                        librarian = villager;
-                        current_state = VillagerCheckingState.WAIT_FOR_TRADE_OFFER;
-                        client.interactionManager.interactEntity(player,closestEntity, Hand.MAIN_HAND);
+                    if(villager != null ){
+                        if(villager.getVillagerData().getProfession() == VillagerProfession.LIBRARIAN){
+                            librarian = villager;
+                            current_state = VillagerCheckingState.WAIT_FOR_TRADE_OFFER;
+                            if(client.interactionManager != null){
+                                client.interactionManager.interactEntity(player,closestEntity, Hand.MAIN_HAND);
+                            }
+                        }
                     }
                 }else if (current_state == VillagerCheckingState.GOT_OFFER){
                     lecternPos = null;
@@ -150,10 +155,11 @@ public class AutoVillagerMain extends Module {
                                                     offersRenderer.toShow = "Got a good offer: " + offersRenderer.enchantName + " " + offersRenderer.enchantLevel;
                                                     offersRenderer.toShowColor = 0x61ff33;
                                                     current_state = VillagerCheckingState.NONE;
-                                                    enabled = false;
+                                                    this.setEnabled(false);
                                                     MinecraftClient.getInstance().player.sendMessage(Text.of("Villager Switching is now " + ((enabled) ? "enabled":"disabled") ), true);
                                                 } else {
                                                     current_state = VillagerCheckingState.AUTOLOOP;
+                                                    client.interactionManager.attackBlock(lecternPos,Direction.UP);
                                                 }
                                             } else {
                                                 current_state = VillagerCheckingState.WAIT_FOR_BLOCK_BREAK;
@@ -170,11 +176,11 @@ public class AutoVillagerMain extends Module {
                 }else if(current_state == VillagerCheckingState.WAIT_FOR_BLOCK_BREAK){
                     if(librarian != null && librarian.getVillagerData().getProfession() != VillagerProfession.LIBRARIAN){
                         offersRenderer.toShow = "Waiting for offers";
+                        offersRenderer.price = "Price: None";
                         offersRenderer.toShowColor =  0xfffc3d;
 
                         BlockHitResult hitResult = new BlockHitResult(new Vec3d(lecternPos.getX(),lecternPos.getY(),lecternPos.getZ()), Direction.UP,lecternPos,false);
                         client.interactionManager.interactBlock(client.player,Hand.OFF_HAND,hitResult);
-
                         current_state = VillagerCheckingState.INIT;
                     }
                     if (librarian == null){
@@ -183,9 +189,9 @@ public class AutoVillagerMain extends Module {
                 }else if (current_state == VillagerCheckingState.AUTOLOOP){
                     BlockState blockState = client.world.getBlockState(lecternPos);
                     if (blockState.getBlock() instanceof LecternBlock) {
-                        client.options.attackKey.setPressed(true);
+                        client.interactionManager.updateBlockBreakingProgress(lecternPos,Direction.UP);
                     }else{
-                        client.options.attackKey.setPressed(false);
+                        //client.options.attackKey.setPressed(false);
                         current_state = VillagerCheckingState.WAIT_FOR_BLOCK_BREAK;
                     }
                 }

@@ -3,17 +3,18 @@ package wisniautilitypack.wisniautilitypack.utils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import org.joml.Matrix4f;
 
-import static net.minecraft.client.gui.DrawableHelper.drawWithShadow;
 import static wisniautilitypack.wisniautilitypack.utils.Colors.RGBtoInt;
 
 public class RendererHUD {
     public static void drawSquare(float x1, float y1, float x2, float y2, Colors.ColorRGBA color){
-        RenderSystem.disableTexture();
         RenderSystem.enableDepthTest();
         RenderSystem.depthFunc(515);
         RenderSystem.enableBlend();
@@ -23,7 +24,7 @@ public class RendererHUD {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
 
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.setShaderColor(1f,1f,1f, 1f);
 
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
@@ -41,10 +42,16 @@ public class RendererHUD {
         RenderSystem.depthMask(true);
         RenderSystem.disableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.enableTexture();
     }
-    public static void drawText(MatrixStack matrices, String text, int x, int y, Colors.ColorRGB color){
+
+    public static void drawText(DrawContext context, String text, float x, float y, int color, int backgroundColor, float scale, boolean shadow){
         TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
-        renderer.drawWithShadow(matrices,text,x,y, RGBtoInt(color));
+        Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+        VertexConsumerProvider consumers = context.getVertexConsumers();
+        matrix.scale(scale);
+        float backToOne = 1f/scale;
+        renderer.draw(text, x*backToOne+(2*backToOne), y*backToOne+(2*backToOne), color, shadow, matrix, consumers, TextRenderer.TextLayerType.NORMAL, backgroundColor, 255);
+        matrix.scale(backToOne);
+        //context.drawText(renderer, text, (int) (window.coord.x1), (int) (window.coord.y1),RGBtoInt(window.textColor),true);
     }
 }

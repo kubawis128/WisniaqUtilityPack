@@ -1,4 +1,4 @@
-package wisniautilitypack.wisniautilitypack.modules.AutoVillagerChecking;
+package wisniautilitypack.wisniautilitypack.modules.AUTO.AutoVillagerChecking;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -10,6 +10,8 @@ import net.minecraft.village.TradeOfferList;
 
 public class offersRenderer {
     public static String toShow = "";
+    public static String price = "";
+
     public static int toShowColor = 0xffffff;
     public static EnchantClass enchantClass;
     public static String enchantName;
@@ -17,8 +19,9 @@ public class offersRenderer {
     public void renderNewOffers(TradeOfferList listOfOffers) {
         toShowColor = 0xff3d3d;
         toShow = "Trade: Nothing";
+        price = "Price: None";
         AutoVillagerMain.tickCounterGuiClear = 0;
-        for (TradeOffer off : listOfOffers) { // for each trade offer
+        for (TradeOffer off : listOfOffers) { // for each tradae offer
 
             Item sellItem = off.getSellItem().getItem();
             ItemStack sellItemStack = off.getSellItem();
@@ -28,24 +31,16 @@ public class offersRenderer {
                 JsonObject parsedNBT = JsonParser.parseString(sellItemStack.getNbt().get("StoredEnchantments").toString()).getAsJsonArray().get(0).getAsJsonObject();
                 String enchant = parsedNBT.get("id").toString().replace("minecraft:", "enchantment.minecraft.").replace("\"", "");
                 Text  enchantTranslated = Text.translatable(enchant);
-                String lvl = parsedNBT.get("lvl").toString().substring(1,2).replace("1","I").replace("2","II").replace("3","III").replace("4","IV").replace("5","V"); // This is really stupid conversion from Arabic to Roman numerals but it works
+                String lvl = parsedNBT.get("lvl").toString().substring(1,2).replace("1","I").replace("2","II").replace("3","III").replace("4","IV").replace("5","V"); // This is really stupid conversion from Arabic to Roman numerals, but it works
                 toShow = "Trade: " + enchantTranslated.getString() +  " " + lvl;
                 enchantName = enchantTranslated.getString();
                 enchantLevel = Integer.parseInt(parsedNBT.get("lvl").toString().substring(1,2));
                 enchantClass = EnchantClassifier.classifyEnchant(enchant,Integer.parseInt(parsedNBT.get("lvl").toString().substring(1,2)));
+                price = "Price: " + off.getOriginalFirstBuyItem().getCount() + "eme";
                 switch (enchantClass){
-                    case GOOD -> {
-                        toShowColor = 0x61ff33;
-                        break;
-                    }
-                    case BAD -> {
-                        toShowColor = 0xff3d3d;
-                        break;
-                    }
-                    case NEUTRAL -> {
-                        toShowColor = 0xffffff;
-                        break;
-                    }
+                    case GOOD -> toShowColor = 0x61ff33;
+                    case BAD -> toShowColor = 0xff3d3d;
+                    case NEUTRAL -> toShowColor = 0xffffff;
                 }
             }
         }

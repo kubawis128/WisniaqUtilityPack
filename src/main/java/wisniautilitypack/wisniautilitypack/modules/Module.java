@@ -19,6 +19,6 @@ public abstract class Module {
         this.category = category;
     }
     public enum ModuleCategory{
-        RENDER,AUTO
+        RENDER,AUTO,COMBAT
     }
 }

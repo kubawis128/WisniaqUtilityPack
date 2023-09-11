@@ -1,4 +1,4 @@
-package wisniautilitypack.wisniautilitypack.modules.ESP;
+package wisniautilitypack.wisniautilitypack.modules.RENDER.ESP;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;

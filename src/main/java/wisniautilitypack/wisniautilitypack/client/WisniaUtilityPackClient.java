@@ -7,14 +7,14 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import wisniautilitypack.wisniautilitypack.gui.GUIElement;
 import wisniautilitypack.wisniautilitypack.gui.WindowingSystem;
-import wisniautilitypack.wisniautilitypack.modules.AutoFishing.AutoFishingMain;
-import wisniautilitypack.wisniautilitypack.modules.AutoVillagerChecking.AutoVillagerMain;
-import wisniautilitypack.wisniautilitypack.modules.ESP.ContainerESP;
-import wisniautilitypack.wisniautilitypack.modules.ESP.EntityESP;
-import wisniautilitypack.wisniautilitypack.modules.HUD.CheatList;
-import wisniautilitypack.wisniautilitypack.modules.HUD.CheatsMenuHUD;
+import wisniautilitypack.wisniautilitypack.modules.AUTO.AutoFarming.AutoFarmingMain;
+import wisniautilitypack.wisniautilitypack.modules.AUTO.AutoFishing.AutoFishingMain;
+import wisniautilitypack.wisniautilitypack.modules.AUTO.AutoVillagerChecking.AutoVillagerMain;
+import wisniautilitypack.wisniautilitypack.modules.RENDER.ESP.ContainerESP;
+import wisniautilitypack.wisniautilitypack.modules.RENDER.ESP.EntityESP;
+import wisniautilitypack.wisniautilitypack.modules.RENDER.HUD.CheatList;
+import wisniautilitypack.wisniautilitypack.modules.RENDER.HUD.CheatsMenuHUD;
 import wisniautilitypack.wisniautilitypack.modules.Module;
-import wisniautilitypack.wisniautilitypack.modules.Utils.XrayMain;
 import wisniautilitypack.wisniautilitypack.modules.Module.ModuleCategory;
 import wisniautilitypack.wisniautilitypack.utils.Colors;
 import wisniautilitypack.wisniautilitypack.utils.events.Event;
@@ -50,8 +50,8 @@ public class WisniaUtilityPackClient implements ClientModInitializer, EventListe
         ModuleList.add(autoVillagerMain);
         AutoFishingMain autoFishingMain = new AutoFishingMain("AutoFish","Automatically catches fish","", ModuleCategory.AUTO);
         ModuleList.add(autoFishingMain);
-        XrayMain xrayMain = new XrayMain("X-Ray","Just plain old X-Ray","", ModuleCategory.RENDER);
-        ModuleList.add(xrayMain);
+        AutoFarmingMain autoAutoFarmingMain = new AutoFarmingMain("AutoFarm","Automatically plants crops","", ModuleCategory.AUTO);
+        ModuleList.add(autoAutoFarmingMain);
         EntityESP entityESP = new EntityESP("EntityESP","Draws box over hit-boxes of entities","", ModuleCategory.RENDER);
         ModuleList.add(entityESP);
         ContainerESP containerESP = new ContainerESP("Chest ESP","Draws box over chest","", ModuleCategory.RENDER);
@@ -64,11 +64,12 @@ public class WisniaUtilityPackClient implements ClientModInitializer, EventListe
         int index = 0;
         for (ModuleCategory category: ModuleCategory.values()) {
             WindowingSystem.addWindow(new WindowingSystem.Window(
-                    new WindowingSystem.Coordinates(60*index,0,50,100),10, category.name(),
+                    new WindowingSystem.Coordinates(new WindowingSystem.Pos2D(60*index,0),50,100),10, category.name(),
                     new Colors.ColorRGBA(0,0,0,.4f),    // Body color
                     new Colors.ColorRGBA(0,0,0,.6f),    // Title Bar color
                     new Colors.ColorRGB(1f,1f,1f),    // Text color
-                    new ArrayList<>()
+                    new ArrayList<>(),
+                    new WindowingSystem.Pos2D(0,0)
             ));
             index++;
         }

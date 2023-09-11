@@ -11,7 +11,6 @@ public class Event {
     }
 
     public void call(EventName eventName) {
-        // Notify everybody that may be interested.
         for (EventListener eventListener : listeners)
             eventListener.onEvent(eventName);
     }

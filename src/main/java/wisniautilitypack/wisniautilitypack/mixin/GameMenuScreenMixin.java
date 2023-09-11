@@ -21,8 +21,6 @@ public abstract class GameMenuScreenMixin extends Screen{
 
     @Inject(at = @At("RETURN"), method = "initWidgets()V")
     private void initWidgets(CallbackInfo ci) {
-        this.addDrawableChild(new ButtonWidget(this.width / 2 + 102 - 285, this.height / 4 + 24 + -16, 75, 20, net.minecraft.text.Text.of("Wisniaq menu"), (button) -> {
-            MinecraftClient.getInstance().setScreen(new CottonClientScreen(new UtilityScreen()));
-        }));
+        this.addDrawableChild(ButtonWidget.builder(net.minecraft.text.Text.of("Wisniaq menu"), (button) -> MinecraftClient.getInstance().setScreen(new CottonClientScreen(new UtilityScreen()))).position(this.width / 2 + 102 - 285, this.height / 4 + 24 + -16).size(75,20).build());
     }
 }

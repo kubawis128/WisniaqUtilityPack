@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wisniautilitypack.wisniautilitypack.modules.AutoFishing.AutoFishingMain;
+import wisniautilitypack.wisniautilitypack.modules.AUTO.AutoFishing.AutoFishingMain;
 
 @Mixin(FishingBobberEntity.class)
 public class FishingSplash {

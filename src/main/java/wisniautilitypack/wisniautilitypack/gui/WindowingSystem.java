@@ -1,15 +1,23 @@
 package wisniautilitypack.wisniautilitypack.gui;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
+import net.minecraft.client.gui.tooltip.Tooltip;
+import net.minecraft.client.gui.tooltip.TooltipPositioner;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
-import wisniautilitypack.wisniautilitypack.modules.HUD.CheatsMenuHUD;
+import wisniautilitypack.wisniautilitypack.modules.RENDER.HUD.CheatsMenuHUD;
 import wisniautilitypack.wisniautilitypack.modules.Module;
 import wisniautilitypack.wisniautilitypack.utils.Colors;
+import wisniautilitypack.wisniautilitypack.utils.RendererHUD;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static wisniautilitypack.wisniautilitypack.utils.Colors.RGBtoInt;
@@ -34,17 +42,16 @@ public class WindowingSystem extends Screen {
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
         {
-            System.out.println("MouseClicked: " + mouseButton);
             if(mouseButton == 0){
                 drag = true;
             }
             return super.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
+
         @Override
         public boolean mouseReleased(double mouseX, double mouseY, int mouseButton)
         {
-            System.out.println("MouseReleased: " + mouseButton);
             if(mouseButton == 0){
                 drag = false;
                 waitForRelease = false;
@@ -55,7 +62,6 @@ public class WindowingSystem extends Screen {
         @Override
         public boolean mouseScrolled(double mouseX, double mouseY, double delta)
         {
-            System.out.println("Mouse scroll: \nX: " + mouseX + "\nY: " + mouseY + "\ndelta: " + delta);
             return super.mouseScrolled(mouseX, mouseY, delta);
         }
 
@@ -70,47 +76,50 @@ public class WindowingSystem extends Screen {
         }
     }
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY,
-                       float partialTicks)
+    public void render(DrawContext context, int mouseX, int mouseY, float partialTicks)
     {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        super.render(context, mouseX, mouseY, partialTicks);
         for (Window window : windowsList) {
-            if(drag && mouseX >= window.coord.x1 && mouseX <= window.coord.x1 + window.coord.width && mouseY >= window.coord.y1-5 && mouseY <= window.coord.y1 + window.titleBarHeight+5){
-                if(Objects.equals(draggingWindowTitle, window.Title) || Objects.equals(draggingWindowTitle, "")){
-                    System.out.println("Dragging window: " + window.Title);
-                    window.coord.setX1(mouseX-(window.coord.width/2));
-                    window.coord.setY1(mouseY-(window.titleBarHeight/2));
+            if(drag && mouseX >= window.coord.pos.x && mouseX <= window.coord.pos.x + window.coord.width && mouseY >= window.coord.pos.y-5 && mouseY <= window.coord.pos.y + window.titleBarHeight+5){
+                if(Objects.equals(draggingWindowTitle, "")){
                     draggingWindowTitle = window.Title;
+                    window.holding.x = mouseX;
+                    window.holding.y = mouseY;
                 }
             }
+            if(Objects.equals(draggingWindowTitle, window.Title) ){
+                window.coord.pos.x -= window.holding.x - mouseX;
+                window.coord.pos.y -= window.holding.y - mouseY;
+                window.holding.x = mouseX;
+                window.holding.y = mouseY;
+            }
+
             if(!drag) {
                 draggingWindowTitle = "";
             }
-            drawWindow(matrixStack, window, mouseX, mouseY);
+            drawWindow(context, window, mouseX, mouseY);
         }
 
     }
-    public static void drawWindow(MatrixStack matrices,Window window, int mouseX, int mouseY){
+    public void drawWindow(DrawContext context, Window window, int mouseX, int mouseY){
         // Window Body
-        drawSquare(window.coord.x1, window.coord.y1, window.coord.width+window.coord.x1, window.coord.height+window.coord.y1, window.bodyColor);
+        drawSquare(window.coord.pos.x, window.coord.pos.y, window.coord.width+window.coord.pos.x, window.coord.height+window.coord.pos.y, window.bodyColor);
 
         // Top bar
-        drawSquare(window.coord.x1, window.coord.y1, window.coord.width+window.coord.x1,window.coord.y1 + window.titleBarHeight, window.titleBarColor);
+        drawSquare(window.coord.pos.x, window.coord.pos.y, window.coord.width+window.coord.pos.x,window.coord.pos.y + window.titleBarHeight, window.titleBarColor);
 
         // Title
         TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
-        matrices.scale(0.75f,0.75f,0.75f);
-        float backToOne = 1f/0.75f;
-        renderer.drawWithShadow(matrices,window.Title,window.coord.x1*backToOne+(2*backToOne),window.coord.y1*backToOne+(2*backToOne), RGBtoInt(window.textColor));
-        matrices.scale(backToOne,backToOne,backToOne);
+        RendererHUD.drawText(context, window.Title, window.coord.pos.x, window.coord.pos.y, RGBtoInt(window.textColor), RGBtoInt(new Colors.ColorRGB(0,0,0)),.75f,true);
+
         int index = 0;
         for (GUIElement element: window.elements) {
             if(element.type == GUIElement.ElementType.TEXT){
                 if(element.getWidth() > window.coord.width){
-                    window.coord.setWidth(element.getWidth());
+                    window.coord.width = element.getWidth();
                 }
-                drawSquare(window.coord.x1, window.coord.y1 + window.titleBarHeight + (10 * index), window.coord.width+window.coord.x1,window.coord.y1 + window.titleBarHeight + (10 * index) + 10, new Colors.ColorRGBA(0,0,0,.5f));
-                renderer.drawWithShadow(matrices,element.getText(),window.coord.x1 + 2,window.coord.y1 + window.titleBarHeight + (10 * index) + 2, RGBtoInt(element.colorRGB));
+                drawSquare(window.coord.pos.x, window.coord.pos.y + window.titleBarHeight + (10 * index), window.coord.width+window.coord.pos.x,window.coord.pos.y + window.titleBarHeight + (10 * index) + 10, new Colors.ColorRGBA(0,0,0,.5f));
+                context.drawText(renderer,element.getText(),window.coord.pos.x + 2,window.coord.pos.y + window.titleBarHeight + (10 * index) + 2, RGBtoInt(element.colorRGB), true);
                 index++;
             }
             if(element.type == GUIElement.ElementType.MODULETOGGLE){
@@ -118,17 +127,25 @@ public class WindowingSystem extends Screen {
                     return;
                 }
                 if(element.getWidth() > window.coord.width){
-                    window.coord.setWidth(element.getWidth());
+                    window.coord.width = element.getWidth();
                 }
-                if(!waitForRelease && drag && mouseX >= window.coord.x1 && mouseX <= window.coord.x1 + window.coord.width && mouseY >= window.coord.y1 + window.titleBarHeight + (10 * index) && mouseY <= window.coord.y1 + window.titleBarHeight + (10 * index) + 10){
-                    if(Objects.equals(draggingWindowTitle,"")) {
-                        System.out.println("Clicked: " + element.getText());
-                        element.getModule().setEnabled(!element.getModule().getEnabled());
-                        waitForRelease = true;
+                if(mouseX >= window.coord.pos.x && mouseX <= window.coord.pos.x + window.coord.width && mouseY >= window.coord.pos.y + window.titleBarHeight + (10 * index) && mouseY <= window.coord.pos.y + window.titleBarHeight + (10 * index) + 10){
+                    if(hasAltDown()){
+                        Text tooltip = Text.of(element.getModule().description);
+                        PositionedTooltip tool = new PositionedTooltip(Tooltip.wrapLines(MinecraftClient.getInstance(), tooltip), HoveredTooltipPositioner.INSTANCE);
+                        context.drawTooltip(this.textRenderer, tool.tooltip(), tool.positioner(), mouseX, mouseY);
+                    }
+
+                    if(!waitForRelease && drag){
+                        if(Objects.equals(draggingWindowTitle,"")) {
+                            System.out.println("Clicked: " + element.getText());
+                            element.getModule().setEnabled(!element.getModule().getEnabled());
+                            waitForRelease = true;
+                        }
                     }
                 }
-                drawSquare(window.coord.x1, window.coord.y1 + window.titleBarHeight + (10 * index), window.coord.width+window.coord.x1,window.coord.y1 + window.titleBarHeight + (10 * index) + 10, (element.getModule().getEnabled()) ? new Colors.ColorRGBA(0,1,0,.5f):new Colors.ColorRGBA(0,0,0,.5f));
-                renderer.drawWithShadow(matrices,element.getText(),window.coord.x1 + 2,window.coord.y1 + window.titleBarHeight + (10 * index) + 2, RGBtoInt(element.colorRGB));
+                drawSquare(window.coord.pos.x, window.coord.pos.y + window.titleBarHeight + (10 * index), window.coord.width+window.coord.pos.x,window.coord.pos.y + window.titleBarHeight + (10 * index) + 10, (element.getModule().getEnabled()) ? new Colors.ColorRGBA(0,1,0,.5f):new Colors.ColorRGBA(0,0,0,.5f));
+                context.drawText(renderer,element.getText(),window.coord.pos.x + 2,window.coord.pos.y + window.titleBarHeight + (10 * index) + 2, RGBtoInt(element.colorRGB), true);
                 index++;
             }
         }
@@ -141,36 +158,38 @@ public class WindowingSystem extends Screen {
                          Colors.ColorRGBA bodyColor,
                          Colors.ColorRGBA titleBarColor,
                          Colors.ColorRGB textColor,
-                         ArrayList<GUIElement> elements
-    ){};
+                         ArrayList<GUIElement> elements,
+                         Pos2D holding 
+    ){}
     public static class Coordinates {
-        private int width;
-        private int height;
+        public int width;
+        public int height;
 
-        private int x1;
-        private int y1;
+        public Pos2D pos;
 
-
-        public Coordinates(int x1, int y1, int width, int height) {
-            this.x1 = x1;
-            this.y1 = y1;
+        public Coordinates(Pos2D pos, int width, int height) {
+            this.pos = pos;
             this.width = width;
             this.height = height;
+        }
+    }
+    public static class Pos2D {
+        public int x;
+        public int y;
 
+        public Pos2D(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+    @Environment(EnvType.CLIENT)
+    private record PositionedTooltip(List<OrderedText> tooltip, TooltipPositioner positioner) {
+        public List<OrderedText> tooltip() {
+            return this.tooltip;
         }
 
-        public void setX1(int x1) {
-            this.x1 = x1;
+        public TooltipPositioner positioner() {
+            return this.positioner;
         }
-        public void setY1(int y1) {
-            this.y1 = y1;
-        }
-        public void setWidth(int width) {
-            this.width = width;
-        }
-        public void setHeight(int height) {
-            this.height = height;
-        }
-
     }
 }

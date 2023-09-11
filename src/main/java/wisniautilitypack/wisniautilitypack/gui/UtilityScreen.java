@@ -4,9 +4,9 @@ import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.Insets;
 import net.minecraft.text.Text;
-import wisniautilitypack.wisniautilitypack.modules.AutoVillagerChecking.AutoVillagerMain;
-import wisniautilitypack.wisniautilitypack.modules.AutoVillagerChecking.EnchantClassifier.Enchant;
-import wisniautilitypack.wisniautilitypack.modules.AutoVillagerChecking.EnchantClassifier;
+import wisniautilitypack.wisniautilitypack.modules.AUTO.AutoVillagerChecking.AutoVillagerMain;
+import wisniautilitypack.wisniautilitypack.modules.AUTO.AutoVillagerChecking.EnchantClassifier.Enchant;
+import wisniautilitypack.wisniautilitypack.modules.AUTO.AutoVillagerChecking.EnchantClassifier;
 
 import java.util.ArrayList;
 

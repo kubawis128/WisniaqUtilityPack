@@ -6,7 +6,6 @@
   "mixins": [
     "GameMenuScreenMixin",
     "ClientConnectionMixin",
-    "ShouldRenderSideMixin",
     "FishingSplash",
     "WorldRendererMixin",
     "OnHudUpdateMixin",
